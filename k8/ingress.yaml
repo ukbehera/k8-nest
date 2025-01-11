@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: dev
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - host: k8demo.com
+    http:
+      paths:
+      - path: /nest(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service: 
+            name: k8-crud-app-service
+            port:
+              number: 80
+      - path: /java(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: k8-crud-boot-service
+            port:
+              number: 80

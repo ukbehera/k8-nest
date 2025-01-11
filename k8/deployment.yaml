@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8-crud-app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: k8-crud-app
+  template:
+    metadata:
+      labels:
+        app: k8-crud-app
+    spec:
+      containers:
+      - name: k8-crud-app
+        image: k8-crud-app:latest
+        env:
+        - name: APP_TYPICODE_API
+          valueFrom:
+            secretKeyRef:
+              name: k8-crud-secret
+              key: APP_TYPICODE_API
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3333
+        # Readiness probe to check if the application is ready to serve traffic
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3333
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        # Liveness probe to check if the application is still running
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3333
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        # Resource limits to specify the minimum and maximum resources for the container
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
